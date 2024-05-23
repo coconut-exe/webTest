@@ -37,3 +37,11 @@ footer {
     font-size: 18px;
     color: #333;
 }
+
+/* 定义图片的大小和透明度 */
+.resized-image {
+    width: 50%; /* 调整宽度为50% */
+    height: auto; /* 自动调整高度以保持宽高比 */
+    opacity: 0.3; /* 设置透明度，值在0到1之间，1为不透明 */
+}
+
