@@ -22,6 +22,7 @@ const readData = async () => {
         'X-Master-Key': JSONBIN_API_KEY,
       },
     });
+    console.log('Data read from JSONBin:', response.data.record);
     return response.data.record;
   } catch (error) {
     console.error('Error reading data:', error);
@@ -38,6 +39,7 @@ const writeData = async (data) => {
         'X-Master-Key': JSONBIN_API_KEY,
       },
     });
+    console.log('Data written to JSONBin:', data);
   } catch (error) {
     console.error('Error writing data:', error);
   }
@@ -46,6 +48,7 @@ const writeData = async (data) => {
 // 处理获取用户访问状态的请求
 app.post('/getStatus', async (req, res) => {
   const { username } = req.body;
+  console.log('Received getStatus request for username:', username);
   const data = await readData();
   if (data[username]) {
     res.json(data[username]);
@@ -57,6 +60,7 @@ app.post('/getStatus', async (req, res) => {
 // 处理记录用户访问的请求
 app.post('/recordVisit', async (req, res) => {
   const { username, source } = req.body;
+  console.log('Received recordVisit request for username:', username, 'with source:', source);
   const data = await readData();
   if (!data[username]) {
     data[username] = { email: false, social: false, ads: false };
