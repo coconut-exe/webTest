@@ -22,7 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ username, source })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 visitedSourcesStatus.innerHTML = `
                     email ${data.email ? '✅' : '❌'}<br>
@@ -32,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Error:', error);
+                visitedSourcesStatus.textContent = 'Error: ' + error.message;
             });
         } else {
             visitedSourcesStatus.textContent = 'Please enter a username.';
