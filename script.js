@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailMessage = document.getElementById('emailMessage');
     const socialMessage = document.getElementById('socialMessage');
     const adsMessage = document.getElementById('adsMessage');
-    const visitedSources = document.getElementById('visitedSources');
+    const visitedSourcesStatus = document.getElementById('visitedSourcesStatus');
 
     // 获取 URL 中的查询参数
     const urlParams = new URLSearchParams(window.location.search);
@@ -38,8 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
     }
 
-    // 显示所有访问过的状态
-    visitedSources.textContent = 'Visited sources: ' + sources.join(', ');
+    // 显示访问状态
+    visitedSourcesStatus.innerHTML = `
+        email ${sources.includes('email') ? '✅' : '❌'}<br>
+        advertisement ${sources.includes('ads') ? '✅' : '❌'}<br>
+        social ${sources.includes('social') ? '✅' : '❌'}
+    `;
 
     // 按钮点击事件示例
     button.addEventListener('click', () => {
