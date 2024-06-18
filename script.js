@@ -15,6 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
     checkStatusButton.addEventListener('click', () => {
         const username = usernameInput.value.trim();
         if (username) {
+            fetch('/getStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                visitedSourcesStatus.innerHTML = `
+                    email ${data.email ? '✅' : '❌'}<br>
+                    advertisement ${data.ads ? '✅' : '❌'}<br>
+                    social ${data.social ? '✅' : '❌'}
+                `;
+            });
+        } else {
+            visitedSourcesStatus.textContent = 'Please enter a username.';
+        }
+    });
+
+    // 如果当前 source 存在，记录访问
+    if (source) {
+        const username = usernameInput.value.trim();
+        if (username) {
             fetch('/recordVisit', {
                 method: 'POST',
                 headers: {
@@ -22,27 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ username, source })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                visitedSourcesStatus.innerHTML = `
-                    email ${data.email ? '✅' : '❌'}<br>
-                    advertisement ${data.ads ? '✅' : '❌'}<br>
-                    social ${data.social ? '✅' : '❌'}
-                `;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                visitedSourcesStatus.textContent = 'Error: ' + error.message;
+                console.log('Visit recorded:', data);
             });
-        } else {
-            visitedSourcesStatus.textContent = 'Please enter a username.';
         }
-    });
+    }
 
     // 按钮点击事件示例
     button.addEventListener('click', () => {
