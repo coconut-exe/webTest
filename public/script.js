@@ -1,31 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const visitCountElement = document.getElementById('visitCount');
-    const button = document.getElementById('myButton');
-
-    // 获取点击计数
-    fetch('/clickCount')
-        .then(response => response.json())
-        .then(data => {
-            visitCountElement.textContent = `Total Clicks: ${data.clickCount}`;
-        })
-        .catch(error => {
-            console.error('Error fetching click count:', error);
-        });
-
-    // 按钮点击事件
-    button.addEventListener('click', () => {
-        fetch('/click', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            visitCountElement.textContent = `Total Clicks: ${data.clickCount}`;
-        })
-        .catch(error => {
-            console.error('Error processing click:', error);
-        });
+    const clickButton = document.getElementById('clickButton');
+    const clickCountDisplay = document.getElementById('clickCount');
+  
+    const updateClickCount = async () => {
+      try {
+        const response = await fetch('/clickCount');
+        const data = await response.json();
+        clickCountDisplay.textContent = `Click count: ${data.clickCount}`;
+      } catch (err) {
+        clickCountDisplay.textContent = 'Error loading click count';
+      }
+    };
+  
+    clickButton.addEventListener('click', async () => {
+      try {
+        const response = await fetch('/click', { method: 'POST' });
+        const data = await response.json();
+        clickCountDisplay.textContent = `Click count: ${data.clickCount}`;
+      } catch (err) {
+        console.error('Error processing click:', err);
+      }
     });
-});
+  
+    updateClickCount();
+  });
