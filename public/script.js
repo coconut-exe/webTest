@@ -2,11 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const usernameInput = document.getElementById('usernameInput');
     const checkStatusButton = document.getElementById('checkStatusButton');
     const visitedSourcesStatus = document.getElementById('visitedSourcesStatus');
+    const visitCountElement = document.getElementById('visitCount');
     const button = document.getElementById('myButton');
 
-    // 获取 URL 中的查询参数
-    const urlParams = new URLSearchParams(window.location.search);
-    const source = urlParams.get('source');
+    // 获取访问计数
+    fetch('/visitCount')
+        .then(response => response.json())
+        .then(data => {
+            visitCountElement.textContent = `Total Visits: ${data.visitCount}`;
+        })
+        .catch(error => {
+            console.error('Error fetching visit count:', error);
+        });
 
     // 用户输入账号后检查访问状态
     checkStatusButton.addEventListener('click', () => {
@@ -33,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 如果当前 source 存在，记录访问
+    const urlParams = new URLSearchParams(window.location.search);
+    const source = urlParams.get('source');
     if (source) {
         const username = usernameInput.value.trim();
         if (username) {

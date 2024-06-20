@@ -18,6 +18,10 @@ const User = sequelize.define('User', {
     social: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    visitCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     }
 });
 

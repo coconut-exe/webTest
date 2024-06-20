@@ -10,39 +10,34 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 处理获取用户访问状态的请求
-app.post('/getStatus', async (req, res) => {
-    const { username } = req.body;
-    console.log('Received getStatus request for username:', username);
+// 每次访问主页时增加访问计数
+app.get('/', async (req, res) => {
     try {
-        const user = await User.findByPk(username);
+        const user = await User.findByPk('visitor');
         if (user) {
-            res.json(user);
+            user.visitCount += 1;
+            await user.save();
         } else {
-            res.json({ email: false, social: false, ads: false });
+            await User.create({ username: 'visitor', visitCount: 1 });
         }
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
     } catch (error) {
-        console.error('Error reading data:', error);
+        console.error('Error processing request:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-// 处理记录用户访问的请求
-app.post('/recordVisit', async (req, res) => {
-    const { username, source } = req.body;
-    console.log('Received recordVisit request for username:', username, 'with source:', source);
+// 获取访问计数
+app.get('/visitCount', async (req, res) => {
     try {
-        let user = await User.findByPk(username);
-        if (!user) {
-            user = await User.create({ username, email: '', ads: false, social: false });
+        const user = await User.findByPk('visitor');
+        if (user) {
+            res.json({ visitCount: user.visitCount });
+        } else {
+            res.json({ visitCount: 0 });
         }
-        if (source) {
-            user[source] = true;
-            await user.save();
-        }
-        res.json(user);
     } catch (error) {
-        console.error('Error processing request:', error);
+        console.error('Error reading data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
