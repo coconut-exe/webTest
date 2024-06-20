@@ -1,30 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const button = document.getElementById('myButton');
-    const clickCountDisplay = document.getElementById('clickCountDisplay');
+    const clickButton = document.getElementById('clickButton');
+    const clickCountDisplay = document.getElementById('clickCount');
 
-    // 获取点击计数
+    // 获取点击次数
     fetch('/clickCount')
         .then(response => response.json())
         .then(data => {
-            clickCountDisplay.textContent = `Click count: ${data.count}`;
+            clickCountDisplay.textContent = `Click count: ${data.clickCount}`;
         })
         .catch(error => {
             console.error('Error fetching click count:', error);
             clickCountDisplay.textContent = 'Error loading click count';
         });
 
-    // 按钮点击事件
-    button.addEventListener('click', () => {
+    // 记录点击次数
+    clickButton.addEventListener('click', () => {
         fetch('/click', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
+            }
         })
         .then(response => response.json())
         .then(data => {
-            clickCountDisplay.textContent = `Click count: ${data.count}`;
+            fetch('/clickCount')
+                .then(response => response.json())
+                .then(data => {
+                    clickCountDisplay.textContent = `Click count: ${data.clickCount}`;
+                });
         })
         .catch(error => {
             console.error('Error processing click:', error);
