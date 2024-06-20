@@ -1,66 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const usernameInput = document.getElementById('usernameInput');
-    const checkStatusButton = document.getElementById('checkStatusButton');
-    const visitedSourcesStatus = document.getElementById('visitedSourcesStatus');
     const visitCountElement = document.getElementById('visitCount');
     const button = document.getElementById('myButton');
 
-    // 获取访问计数
-    fetch('/visitCount')
+    // 获取点击计数
+    fetch('/clickCount')
         .then(response => response.json())
         .then(data => {
-            visitCountElement.textContent = `Total Visits: ${data.visitCount}`;
+            visitCountElement.textContent = `Total Clicks: ${data.clickCount}`;
         })
         .catch(error => {
-            console.error('Error fetching visit count:', error);
+            console.error('Error fetching click count:', error);
         });
 
-    // 用户输入账号后检查访问状态
-    checkStatusButton.addEventListener('click', () => {
-        const username = usernameInput.value.trim();
-        if (username) {
-            fetch('/getStatus', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username })
-            })
-            .then(response => response.json())
-            .then(data => {
-                visitedSourcesStatus.innerHTML = `
-                    email ${data.email ? '✅' : '❌'}<br>
-                    advertisement ${data.ads ? '✅' : '❌'}<br>
-                    social ${data.social ? '✅' : '❌'}
-                `;
-            });
-        } else {
-            visitedSourcesStatus.textContent = 'Please enter a username.';
-        }
-    });
-
-    // 如果当前 source 存在，记录访问
-    const urlParams = new URLSearchParams(window.location.search);
-    const source = urlParams.get('source');
-    if (source) {
-        const username = usernameInput.value.trim();
-        if (username) {
-            fetch('/recordVisit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, source })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Visit recorded:', data);
-            });
-        }
-    }
-
-    // 按钮点击事件示例
+    // 按钮点击事件
     button.addEventListener('click', () => {
-        alert('Button clicked!');
+        fetch('/click', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            visitCountElement.textContent = `Total Clicks: ${data.clickCount}`;
+        })
+        .catch(error => {
+            console.error('Error processing click:', error);
+        });
     });
 });
