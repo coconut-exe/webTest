@@ -1,36 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const clickButton = document.getElementById('clickButton');
-    const clickCountDisplay = document.getElementById('clickCount');
+    const usernameInput = document.getElementById('usernameInput');
+    const checkStatusButton = document.getElementById('checkStatusButton');
+    const visitedSourcesStatus = document.getElementById('visitedSourcesStatus');
 
-    // 获取点击次数
-    fetch('/clickCount')
-        .then(response => response.json())
-        .then(data => {
-            clickCountDisplay.textContent = `Click count: ${data.clickCount}`;
-        })
-        .catch(error => {
-            console.error('Error fetching click count:', error);
-            clickCountDisplay.textContent = 'Error loading click count';
-        });
-
-    // 记录点击次数
-    clickButton.addEventListener('click', () => {
-        fetch('/click', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            fetch('/clickCount')
-                .then(response => response.json())
-                .then(data => {
-                    clickCountDisplay.textContent = `Click count: ${data.clickCount}`;
-                });
-        })
-        .catch(error => {
-            console.error('Error processing click:', error);
-        });
+    // 用户输入账号后检查访问状态
+    checkStatusButton.addEventListener('click', () => {
+        const username = usernameInput.value.trim();
+        if (username) {
+            fetch('/getStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                visitedSourcesStatus.innerHTML = `
+                    email ${data.email ? '✅' : '❌'}<br>
+                    advertisement ${data.ads ? '✅' : '❌'}<br>
+                    social ${data.social ? '✅' : '❌'}
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching status:', error);
+                visitedSourcesStatus.textContent = 'Error fetching status';
+            });
+        } else {
+            visitedSourcesStatus.textContent = 'Please enter a username.';
+        }
     });
 });

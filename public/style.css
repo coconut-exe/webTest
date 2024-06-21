@@ -1,10 +1,10 @@
-/* 简单的 CSS 样式 */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin-top: 50px;
+    padding: 50px;
 }
 
 input, button {
+    padding: 10px;
     margin: 10px;
 }

@@ -1,40 +1,62 @@
-require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const Click = require('./models/Click');
-const sequelize = require('./database');
+const cors = require('cors');
+const sequelize = require('./database'); // 确保路径正确
+const User = require('./models/User'); // 确保路径正确
+require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
-app.get('/clickCount', async (req, res) => {
-    try {
-        const click = await Click.findOne({ where: { id: 1 } });
-        const clickCount = click ? click.clickCount : 0;
-        res.json({ clickCount });
-    } catch (error) {
-        console.error('Error fetching click count:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+sequelize.sync({ alter: true }) // 确保数据库与模型同步
+    .then(() => {
+        console.log('Database synced');
+    })
+    .catch((error) => {
+        console.error('Error syncing database:', error);
+    });
+
+app.post('/getStatus', (req, res) => {
+    const { username } = req.body;
+
+    User.findOne({ where: { username } })
+        .then(user => {
+            if (user) {
+                res.json(user);
+            } else {
+                res.json({ email: false, ads: false, social: false });
+            }
+        })
+        .catch(error => {
+            console.error('Error processing request:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
 });
 
-app.post('/click', async (req, res) => {
-    try {
-        const click = await Click.findOne({ where: { id: 1 } });
-        if (click) {
-            click.clickCount += 1;
-            await click.save();
-        } else {
-            await Click.create({ id: 1, clickCount: 1 });
-        }
-        res.json({ message: 'Click recorded' });
-    } catch (error) {
-        console.error('Error processing click:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.post('/recordVisit', (req, res) => {
+    const { username, source } = req.body;
+
+    User.findOne({ where: { username } })
+        .then(user => {
+            if (user) {
+                user[source] = true;
+                return user.save();
+            } else {
+                const newUser = User.build({ username });
+                newUser[source] = true;
+                return newUser.save();
+            }
+        })
+        .then(user => {
+            res.json(user);
+        })
+        .catch(error => {
+            console.error('Error processing request:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
 });
 
 app.listen(port, () => {
